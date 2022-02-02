@@ -1,0 +1,11 @@
+{
+  "name": "the-line-bot",
+  "version": "1.0.0",
+  "description": "Used to export Data from discord servers for easier management",
+  "main": "index.js",
+  "author": "Daniel Heren",
+  "dependencies": {
+    "discord.js": "^13.6.0",
+    "googleapis": "^92.0.0"
+  }
+}

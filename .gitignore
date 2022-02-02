@@ -1,0 +1,5 @@
+node_modules
+*.txt
+credentials.json
+token.json
+auth.json
