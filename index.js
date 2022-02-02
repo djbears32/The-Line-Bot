@@ -193,19 +193,18 @@ client.on('messageCreate', msg => {
             values,
         };
 
-        sheets.spreadsheets.values.append({
+        sheets.spreadsheets.values.update({
             spreadsheetId: sheetId,
             range: tabName + '!A1',
             valueInputOption: 'RAW',
-            insertDataOption: 'OVERWRITE',
             resource: resource
         }, (err, result) => {
             if (err) {
                 // Handle error
                 console.log(err);
             } else {
-                //msg.reply('%d cells updated on range: %s', result.data.updates.updatedCells, result.data.updates.updatedRange); :TO-DO
-                console.log('%d cells updated on range: %s', result.data.updates.updatedCells, result.data.updates.updatedRange);
+                msg.reply(result.data.updatedCells + ' cells updated, range ' + result.data.updatedRange)
+                console.log('%d cells updated on range: %s', result.data.updatedCells, result.data.updatedRange);
             }
         });
     }
