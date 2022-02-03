@@ -30,7 +30,8 @@ const client = new Client({
     intents: [
         Intents.FLAGS.GUILDS,
         Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_VOICE_STATES
+        Intents.FLAGS.GUILD_VOICE_STATES,
+        Intents.FLAGS.GUILD_MEMBERS
     ]
 });
 
@@ -167,10 +168,80 @@ client.on('messageCreate', msg => {
         case 'p-r':
             msg.channel.send('exporting all members with delcared role');
 
+            msg.guild.roles.fetch(772656272935092225);
+            let role = msg.guild.roles.cache.find(r => r.name === 'Sysadmins');
+            //console.log(role);
 
-            let tempMembers = msg.guild.roles.cache.find(role => role.id === '811834212629610508').members.map(m => m.user.tag);
+            msg.guild.members.fetch(770979733076836393);
+            let roleID = "772656272935092225";
+            console.log(msg.guild.roles.cache.get(roleID).members.size);
+            let list = msg.guild.roles.cache.get(roleID).members.map(m => m.nickname)
+            //let list = msg.guild.roles.cache.get(roleID).members.map(m => m.user.tag)
 
-            console.log(tempMembers);
+            //console.log(role);
+            console.log(list);
+
+            //let list = list.roles.cache.get(roleID).members.map(m => m.user.id);
+            //let list = msg.guild.members.cache.filter(m => m.roles.cache.get(roleID));
+
+            //pulls all servers discord bot is on
+            //let list = client.guilds.cache;
+
+            //try {
+            //    await list.members.fetch();
+
+            //    let role1 = list.roles.cache.get(roleID).members.map(m => m.user.id);
+            //    console.log(role1);
+            //} catch (err) {
+            //    console.error(err);
+            //}
+
+
+            //let roleID = "772656272935092225";
+            //let membersWithRole = msg.guild.roles.cache.get(roleID).members.map(m => m.user.id);
+            //let membersWithRole = msg.guild.roles.cache.get(roleID).guild.members;
+            //console.log(membersWithRole);
+
+
+            //console.log(`Got ${membersWithRole.size} members with that role.`);
+
+            //const rolesMap = new Map(msg.guild.roles.cache);
+
+            //for (const [key, value] of rolesMap) {
+            //    if (value.name === 'TL Comp Recruit'
+                    //&& value.name.includes(nameHolder)
+                //) {
+                    //value
+                    //var guildId = value.guild.id;
+                    //var channelId = value.id;
+                    //console.log(value.id)
+                //}
+                //if (channelId === 'undefined') {
+                //    msg.reply('That voice channel does not exist')
+                //    break;
+                //}
+                //shows all channel ids
+                //console.log(value.id)
+            //}
+
+
+
+            //displays entire map 
+            //console.log(rolesMap);
+
+
+            //let membersWithRole = msg.guild.members.filter(member => {
+            //    return member.roles.find("name", roleName);
+            //}).map(member => {
+            //    return member.user.username;
+            //})
+
+
+            //let tempMembers = msg.guild.roles.cache.find(role => role.id === '811834212629610508').members.map(m => m.user.tag);
+
+            //let tempMembers = msg.guild.roles.get('811834212629610508').members.map(m => m.user.id);
+
+            //console.log(membersWithRole);
 
             //for (var i = 0; i < tempMembers.length; i++) {
             //    //console.log(members[i]['displayName']);
