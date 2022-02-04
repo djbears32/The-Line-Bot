@@ -1,7 +1,7 @@
 //TL BOT - Written by DANIEL3232
 
 //Initializations:
-const { Client, Intents, Message, User, Channel } = require('discord.js');
+const { Client, Intents, Message, User, Channel, Role } = require('discord.js');
 const { fetch } = require('node-fetch');
 const { token } = require('./auth.json');
 
@@ -166,20 +166,45 @@ client.on('messageCreate', msg => {
 
             break;
         case 'p-r':
-            msg.channel.send('exporting all members with delcared role');
+            msg.channel.send('exporting all members with declared role');
 
-            msg.guild.roles.fetch(772656272935092225);
-            let role = msg.guild.roles.cache.find(r => r.name === 'Sysadmins');
+            let roleId = '772656272935092225';
+            let termpGuildId = '770979733076836393';
+
+            getMembers();
+
+            async function getMembers() {
+                return await msg.guild.members.fetch()  // fetch all members and cache them
+            }
+ 
+            const role = msg.guild.roles.cache.get(roleId) // get role from cache by ID (roles are always cached)
+            const list = role.members.map(m => m.nickname) // map members by nickname
+
+            console.log(msg.guild.members.cache.size);
+            console.log(list);
+
+            //msg.guild.roles.fetch(roleId)
+            //.then(role => console.log(role.members))
+            //    .catch(console.error);
+
+
+            //msg.guild.members.fetch(roleId)
+            //    .then(members => console.log(role.members))
+            //    .catch(console.error);
+
+
+
+            //let role = msg.guild.roles.cache.find(r => r.name === 'Sysadmins');
             //console.log(role);
 
-            msg.guild.members.fetch(770979733076836393);
-            let roleID = "772656272935092225";
-            console.log(msg.guild.roles.cache.get(roleID).members.size);
-            let list = msg.guild.roles.cache.get(roleID).members.map(m => m.nickname)
+            //msg.guild.roles.fetch('811834212629610508');
+            
+            //console.log(msg.guild.roles.cache.get(roleID).members.size);
+            //let list = msg.guild.roles.cache.get(roleID).members.map(m => m.nickname)
             //let list = msg.guild.roles.cache.get(roleID).members.map(m => m.user.tag)
 
             //console.log(role);
-            console.log(list);
+            
 
             //let list = list.roles.cache.get(roleID).members.map(m => m.user.id);
             //let list = msg.guild.members.cache.filter(m => m.roles.cache.get(roleID));
