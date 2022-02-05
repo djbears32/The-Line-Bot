@@ -9,6 +9,7 @@ const { token } = require('./auth.json');
 const { google } = require('googleapis');
 const fs = require('fs');
 const readline = require('readline');
+const { resolve } = require('dns');
 //Attack Timing Spreadsheet
 const personalSpreadsheetId = '17m2fSXSTwMZJR63RJgtcRKS5unjERzfOHM6zV-DbiE8';
 
@@ -52,7 +53,7 @@ client.login(token);
 
 
 
-client.on('messageCreate', msg => {
+client.on('messageCreate', async msg => {
     var command = '';
     var nameHolder = '';
     var cmdArray = new Array;
@@ -168,20 +169,72 @@ client.on('messageCreate', msg => {
         case 'p-r':
             msg.channel.send('exporting all members with declared role');
 
-            let roleId = '772656272935092225';
-            let termpGuildId = '770979733076836393';
+            let roleId = '811834212629610508';
+            let tempGuildId = '770979733076836393';
 
-            getMembers();
+            let list = client.guilds.cache.get(tempGuildId);
 
-            async function getMembers() {
-                return await msg.guild.members.fetch()  // fetch all members and cache them
+            try {
+                await list.members.fetch();
+
+                let role1 = list.roles.cache.get(roleId).members.map(m => m.displayName);
+                console.log(role1);
+            } catch (err) {
+                console.error(err);
             }
- 
-            const role = msg.guild.roles.cache.get(roleId) // get role from cache by ID (roles are always cached)
-            const list = role.members.map(m => m.nickname) // map members by nickname
 
-            console.log(msg.guild.members.cache.size);
-            console.log(list);
+
+
+            //let tempMembers = msg.guild.members.cache.array();
+            //let role = msg.guild.roles.cache.find(r => r.id === roleId);
+            //for (let member of tempMembers) {
+            //    let hasRole = member.roles.cache.has(role.id);
+            //    console.log(`${member.id}: ${hasRole}`);
+            //}
+
+            //only pulling cached members
+            //let nameList = msg.guild.roles.resolve(roleId).members.map(m => m.displayName).join('\n');
+            //console.log(nameList);
+
+            //only pulling cached members
+            //await msg.guild.roles.fetch();
+            //const targetRole = msg.guild.roles.cache.get(roleId);
+            //if (!targetRole) return console.log('No role found')
+            //const tempmembers = msg.guild.members.cache.filter((member) => member.roles.cache.some((role) => role.id === targetRole.id)).map(m => m.displayName)
+            //console.log(tempmembers)
+
+
+            //pulls all members in discord
+            //msg.guild.members.fetch()
+            //    .then(members => {
+            //        const userIds = [...members.keys()]
+            //        console.log(userIds);
+            //    })
+
+            
+
+            
+
+            //finds role based off of role Id
+            //let role = msg.guild.roles.cache.find(r => r.id === roleId);
+            //console.log(role);
+
+            //msg.member.roles.cache.has()
+
+            //guild.members.fetch()
+            //    .then(console.log)
+            //    .catch(console.error);
+
+            //const tempMembers = client.guilds.cache.get(770979733076836393);
+            //tempMembers.members.cache.forEach(member => console.log(member.user.username));
+            
+ 
+            //const role = msg.guild.roles.cache.get(roleId) // get role from cache by ID (roles are always cached)
+            //const list = role.members.map(m => m.nickname) // map members by nickname
+
+            //console.log(msg.guild.members.cache.size);
+            //console.log(list);
+            //console.log(currentMembers);
 
             //msg.guild.roles.fetch(roleId)
             //.then(role => console.log(role.members))
@@ -191,11 +244,6 @@ client.on('messageCreate', msg => {
             //msg.guild.members.fetch(roleId)
             //    .then(members => console.log(role.members))
             //    .catch(console.error);
-
-
-
-            //let role = msg.guild.roles.cache.find(r => r.name === 'Sysadmins');
-            //console.log(role);
 
             //msg.guild.roles.fetch('811834212629610508');
             
