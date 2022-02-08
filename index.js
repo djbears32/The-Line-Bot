@@ -75,7 +75,7 @@ client.on('messageCreate', async msg => {
             "TL CAM" - Personal Roster General"
 \t\tTL
 \t\tCAM - Count Active Members
-\t\tPersonal - Spreadsheet Name = 'Personal', 'Comp', 'Prac'
+\t\tPersonal - Spreadsheet Name = 'Personal', 'Comp', 'Practice'
 \t\tRoster - Tab of Spreadsheet
 \t\tGeneral - Channel Name.`);
             break;
@@ -129,19 +129,13 @@ client.on('messageCreate', async msg => {
                     msg.reply('That voice channel does not exist')
                     break;
                 }
-                //shows all channel ids
-                //console.log(value.id)
             }
 
             //gets members in voice chat
             const voiceChannel = msg.client.channels.cache.get(channelId);
-            //console.log(voiceChannel);
 
             var string = JSON.stringify(voiceChannel.members);
             var members = JSON.parse(string);
-
-            //json data parsed and stringified
-            //[{ "guildId": "850839139380887582", "joinedTimestamp": 1622927999713, "premiumSinceTimestamp": null, "nickname": "Sexy Gorgeous Big Dick Haver", "pending": false, "communicationDisabledUntilTimestamp": null, "userId": "151651051655659520", "avatar": null, "displayName": "Sexy Gorgeous Big Dick Haver", "roles": ["850844826155876372", "933123362107052123", "850839139380887582"], "avatarURL": null, "displayAvatarURL": "https://cdn.discordapp.com/avatars/151651051655659520/594762e38d79a5b77e8501f88b078575.webp" }, { "guildId": "850839139380887582", "joinedTimestamp": 1622926258660, "premiumSinceTimestamp": null, "nickname": null, "pending": false, "communicationDisabledUntilTimestamp": null, "userId": "328578198059221003", "avatar": null, "displayName": "DANIEL3232", "roles": ["850844826155876372", "933123362107052123", "850839139380887582"], "avatarURL": null, "displayAvatarURL": "https://cdn.discordapp.com/avatars/328578198059221003/bd325a4829f653f7a9d230b57b2bb070.webp" }]
 
             var name = '';
 
@@ -161,16 +155,43 @@ client.on('messageCreate', async msg => {
             //}
 
             //msg.reply(name);
+
             //calls googlde sheets function
             authorizeGoogleSheets();
 
 
             break;
         case 'p-r':
+            //TODO: add the role name grab in command
             msg.channel.send('exporting all members with declared role');
 
-            let roleId = '811834212629610508';
+            let roleId = '771836636618817637';
             let tempGuildId = '770979733076836393';
+
+            //pulls all information for what sheet and tab to save data to
+            if (cmdArray[2] == 'Personal' || 'Comp' || 'Practice') {
+                switch (cmdArray[2]) {
+                    case 'Personal':
+                        sheetId = personalSpreadsheetId;
+                        break;
+                    case 'Comp':
+                        sheetId = tlCompSpreadsheetId;
+                        break;
+                    case 'Practice':
+                        sheetId = tlPracSpreadsheetId;
+                        break;
+                }
+                tabName = cmdArray[3];
+            }
+            if (cmdArray.length > 3) {
+                for (let i = 4; i < cmdArray.length; i++) {
+                    nameHolder += (cmdArray[i] + " ");
+                }
+                nameHolder = nameHolder.trim();
+            }
+
+            //resets array
+            sheetsData = [];
 
             let list = client.guilds.cache.get(tempGuildId);
 
@@ -179,10 +200,17 @@ client.on('messageCreate', async msg => {
 
                 let role1 = list.roles.cache.get(roleId).members.map(m => m.displayName);
                 console.log(role1);
+
+                //adds items to array for google sheets
+                for (var i = 0; i < role1.length; i++) {
+                    sheetsData.push([role1[i]]);
+                }
+
             } catch (err) {
                 console.error(err);
             }
 
+            authorizeGoogleSheets();
 
 
             //let tempMembers = msg.guild.members.cache.array();
