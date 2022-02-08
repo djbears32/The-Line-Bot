@@ -48,11 +48,6 @@ client.login(token);
 //                                            BOT COMMANDS                                            //
 //====================================================================================================//
 
-//TL Ping - Bot replies with 'Pong'
-//TL CAM Comp Roster General - TL CAM + "SpreadSheetName = 'Personal', 'Comp'" + 'Prac'" + TabName="Roster" + "Channel Name"
-
-
-
 client.on('messageCreate', async msg => {
     var command = '';
     var nameHolder = '';
@@ -199,7 +194,6 @@ client.on('messageCreate', async msg => {
                 await list.members.fetch();
 
                 let role1 = list.roles.cache.get(roleId).members.map(m => m.displayName);
-                console.log(role1);
 
                 //adds items to array for google sheets
                 for (var i = 0; i < role1.length; i++) {
