@@ -11,13 +11,22 @@ const fs = require('fs');
 const readline = require('readline');
 const { resolve } = require('dns');
 //Attack Timing Spreadsheet
-const personalSpreadsheetId = '17m2fSXSTwMZJR63RJgtcRKS5unjERzfOHM6zV-DbiE8';
+const personalSpreadsheetId = '16K4Ilk9Ak5j95Otl_n4ml2Tuipv-g0msY5i50D2xljY';
 
 //TL Competitive Roster
 const tlCompSpreadsheetId = '17UNx2QOV_pIgZOhEfBmqLxWG0-UML7TmOG2ixOnV5_I';
 
 //TL Practice Roster
 const tlPracSpreadsheetId = '1KhAyQBYxsNUFWMyVpk9yd1sqLiFXDuwRDQubRQ_LA-k';
+
+//FNF Roster
+const fnfSpreadsheetId = '1KG8f90wsxNkbg7KOUYwHKTm1p2u0yoJ9QvqWBZ_NMgM';
+
+//NEW TL SERVER
+const TLDiscordId = '960321290940604426';
+
+//OLD TL SERVER
+const OldDiscordId = '770979733076836393';
 
 //Google Sheet Holder Values
 var sheetId = '';
@@ -32,7 +41,8 @@ const client = new Client({
         Intents.FLAGS.GUILDS,
         Intents.FLAGS.GUILD_MESSAGES,
         Intents.FLAGS.GUILD_VOICE_STATES,
-        Intents.FLAGS.GUILD_MEMBERS
+        Intents.FLAGS.GUILD_MEMBERS,
+        Intents.FLAGS.DIRECT_MESSAGES
     ]
 });
 
@@ -59,296 +69,227 @@ client.on('messageCreate', async msg => {
         if (cmdArray.length > 1) {
             command = cmdArray[1].toLowerCase();
         }
-
-    }
-
-    switch (command) {
-        case 'help':
-            msg.channel.send(` Help? Current Commands:
+        switch (command) {
+            case 'help':
+                msg.channel.send(` Help? Current Commands:
             "TL Help" - Bot replies with all commands.
             "TL Ping" - Bot replies Pong.
             "TL CAM" - Personal Roster General"
 \t\tTL
 \t\tCAM - Count Active Members
-\t\tPersonal - Spreadsheet Name = 'Personal', 'Comp', 'Practice'
+\t\tPersonal - Spreadsheet Name = 'Personal', 'Comp', 'Practice', 'FNF'
 \t\tRoster - Tab of Spreadsheet
 \t\tGeneral - Channel Name.`);
-            break;
-        case 'ping':
-            //msg.channel.send('pong ' + msg.author.username);
-            msg.reply('pong');
-            break;
-        case 'cam':
-            msg.channel.send('counting active members in chat');
+                break;
+            case 'ping':
+                //msg.channel.send('pong ' + msg.author.username);
+                msg.reply('pong');
+                break;
+            case 'cam':
+                msg.channel.send('counting active members in chat');
 
-            //pulls all information for what sheet and tab to save data to
-            if (cmdArray[2] == 'Personal' || 'Comp' || 'Practice') {
-                switch (cmdArray[2]) {
-                    case 'Personal':
-                        sheetId = personalSpreadsheetId;
+                //pulls all information for what sheet and tab to save data to
+                if (cmdArray[2] == 'Personal' || 'Comp' || 'Practice') {
+                    switch (cmdArray[2]) {
+                        case 'Personal':
+                            sheetId = personalSpreadsheetId;
+                            break;
+                        case 'Comp':
+                            sheetId = tlCompSpreadsheetId;
+                            break;
+                        case 'Practice':
+                            sheetId = tlPracSpreadsheetId;
+                            break;
+                        case 'FNF':
+                            sheetId = fnfSpreadsheetId;
+                            break;
+                    }
+                    tabName = cmdArray[3];
+                }
+                if (cmdArray.length > 3) {
+                    for (let i = 4; i < cmdArray.length; i++) {
+                        nameHolder += (cmdArray[i] + " ");
+                    }
+                    nameHolder = nameHolder.trim();
+                }
+
+                //resets array
+                sheetsData = [];
+
+                //give me list of all channels on server
+                const theMap = new Map(msg.guild.channels.cache);
+
+                //displays entire map 
+                //console.log(theMap);
+
+                //gives both key and value together
+                for (const [key, value] of theMap) {
+                    if (value.type === 'GUILD_VOICE' && value.name.includes(nameHolder)) {
+
+                        var guildId = value.guild.id;
+                        var channelId = value.id;
+                        //console.log(value.id)
+                    }
+                    if (channelId === 'undefined') {
+                        msg.reply('That voice channel does not exist')
                         break;
-                    case 'Comp':
-                        sheetId = tlCompSpreadsheetId;
-                        break;
-                    case 'Practice':
-                        sheetId = tlPracSpreadsheetId;
-                        break;
-                }
-                tabName = cmdArray[3];
-            }
-            if (cmdArray.length > 3) {
-                for (let i = 4; i < cmdArray.length; i++) {
-                    nameHolder += (cmdArray[i] + " ");
-                }
-                nameHolder = nameHolder.trim();
-            }
-
-            //resets array
-            sheetsData = [];
-
-            //give me list of all channels on server
-            const theMap = new Map(msg.guild.channels.cache);
-
-            //displays entire map 
-            //console.log(theMap);
-
-            //gives both key and value together
-            for (const [key, value] of theMap) {
-                if (value.type === 'GUILD_VOICE' && value.name.includes(nameHolder)) {
-
-                    var guildId = value.guild.id;
-                    var channelId = value.id;
-                    //console.log(value.id)
-                }
-                if (channelId === 'undefined') {
-                    msg.reply('That voice channel does not exist')
-                    break;
-                }
-            }
-
-            //gets members in voice chat
-            const voiceChannel = msg.client.channels.cache.get(channelId);
-
-            var string = JSON.stringify(voiceChannel.members);
-            var members = JSON.parse(string);
-
-            var name = '';
-
-            //display Value
-            for (var i = 0; i < members.length; i++) {
-                //console.log(members[i]['displayName']);
-                name += ((members[i]['displayName']) + '\n');
-                sheetsData.push([members[i]['displayName']]);
-            }
-
-            //console.log(members);
-
-            //nickname value
-            //for (var i = 0; i < members.length; i++) {
-            //console.log(members[i]['nickname']);
-            //name += ((members[i]['nickname']) + '\n');
-            //}
-
-            //msg.reply(name);
-
-            //calls googlde sheets function
-            authorizeGoogleSheets();
-
-
-            break;
-        case 'p-r':
-            //TODO: add the role name grab in command
-            msg.channel.send('exporting all members with declared role');
-
-            let roleId = '771836636618817637';
-            let tempGuildId = '770979733076836393';
-
-            //pulls all information for what sheet and tab to save data to
-            if (cmdArray[2] == 'Personal' || 'Comp' || 'Practice') {
-                switch (cmdArray[2]) {
-                    case 'Personal':
-                        sheetId = personalSpreadsheetId;
-                        break;
-                    case 'Comp':
-                        sheetId = tlCompSpreadsheetId;
-                        break;
-                    case 'Practice':
-                        sheetId = tlPracSpreadsheetId;
-                        break;
-                }
-                tabName = cmdArray[3];
-            }
-            if (cmdArray.length > 3) {
-                for (let i = 4; i < cmdArray.length; i++) {
-                    nameHolder += (cmdArray[i] + " ");
-                }
-                nameHolder = nameHolder.trim();
-            }
-
-            //resets array
-            sheetsData = [];
-
-            let list = client.guilds.cache.get(tempGuildId);
-
-            try {
-                await list.members.fetch();
-
-                let role1 = list.roles.cache.get(roleId).members.map(m => m.displayName);
-
-                //adds items to array for google sheets
-                for (var i = 0; i < role1.length; i++) {
-                    sheetsData.push([role1[i]]);
+                    }
                 }
 
-            } catch (err) {
-                console.error(err);
-            }
+                //gets members in voice chat
+                const voiceChannel = msg.client.channels.cache.get(channelId);
 
-            authorizeGoogleSheets();
+                var string = JSON.stringify(voiceChannel.members);
+                var members = JSON.parse(string);
 
+                var name = '';
 
-            //let tempMembers = msg.guild.members.cache.array();
-            //let role = msg.guild.roles.cache.find(r => r.id === roleId);
-            //for (let member of tempMembers) {
-            //    let hasRole = member.roles.cache.has(role.id);
-            //    console.log(`${member.id}: ${hasRole}`);
-            //}
+                //display Value
+                for (var i = 0; i < members.length; i++) {
+                    //console.log(members[i]['displayName']);
+                    name += ((members[i]['displayName']) + '\n');
+                    sheetsData.push([members[i]['displayName']]);
+                }
 
-            //only pulling cached members
-            //let nameList = msg.guild.roles.resolve(roleId).members.map(m => m.displayName).join('\n');
-            //console.log(nameList);
+                //console.log(members);
 
-            //only pulling cached members
-            //await msg.guild.roles.fetch();
-            //const targetRole = msg.guild.roles.cache.get(roleId);
-            //if (!targetRole) return console.log('No role found')
-            //const tempmembers = msg.guild.members.cache.filter((member) => member.roles.cache.some((role) => role.id === targetRole.id)).map(m => m.displayName)
-            //console.log(tempmembers)
-
-
-            //pulls all members in discord
-            //msg.guild.members.fetch()
-            //    .then(members => {
-            //        const userIds = [...members.keys()]
-            //        console.log(userIds);
-            //    })
-
-            
-
-            
-
-            //finds role based off of role Id
-            //let role = msg.guild.roles.cache.find(r => r.id === roleId);
-            //console.log(role);
-
-            //msg.member.roles.cache.has()
-
-            //guild.members.fetch()
-            //    .then(console.log)
-            //    .catch(console.error);
-
-            //const tempMembers = client.guilds.cache.get(770979733076836393);
-            //tempMembers.members.cache.forEach(member => console.log(member.user.username));
-            
- 
-            //const role = msg.guild.roles.cache.get(roleId) // get role from cache by ID (roles are always cached)
-            //const list = role.members.map(m => m.nickname) // map members by nickname
-
-            //console.log(msg.guild.members.cache.size);
-            //console.log(list);
-            //console.log(currentMembers);
-
-            //msg.guild.roles.fetch(roleId)
-            //.then(role => console.log(role.members))
-            //    .catch(console.error);
-
-
-            //msg.guild.members.fetch(roleId)
-            //    .then(members => console.log(role.members))
-            //    .catch(console.error);
-
-            //msg.guild.roles.fetch('811834212629610508');
-            
-            //console.log(msg.guild.roles.cache.get(roleID).members.size);
-            //let list = msg.guild.roles.cache.get(roleID).members.map(m => m.nickname)
-            //let list = msg.guild.roles.cache.get(roleID).members.map(m => m.user.tag)
-
-            //console.log(role);
-            
-
-            //let list = list.roles.cache.get(roleID).members.map(m => m.user.id);
-            //let list = msg.guild.members.cache.filter(m => m.roles.cache.get(roleID));
-
-            //pulls all servers discord bot is on
-            //let list = client.guilds.cache;
-
-            //try {
-            //    await list.members.fetch();
-
-            //    let role1 = list.roles.cache.get(roleID).members.map(m => m.user.id);
-            //    console.log(role1);
-            //} catch (err) {
-            //    console.error(err);
-            //}
-
-
-            //let roleID = "772656272935092225";
-            //let membersWithRole = msg.guild.roles.cache.get(roleID).members.map(m => m.user.id);
-            //let membersWithRole = msg.guild.roles.cache.get(roleID).guild.members;
-            //console.log(membersWithRole);
-
-
-            //console.log(`Got ${membersWithRole.size} members with that role.`);
-
-            //const rolesMap = new Map(msg.guild.roles.cache);
-
-            //for (const [key, value] of rolesMap) {
-            //    if (value.name === 'TL Comp Recruit'
-                    //&& value.name.includes(nameHolder)
-                //) {
-                    //value
-                    //var guildId = value.guild.id;
-                    //var channelId = value.id;
-                    //console.log(value.id)
+                //nickname value
+                //for (var i = 0; i < members.length; i++) {
+                //console.log(members[i]['nickname']);
+                //name += ((members[i]['nickname']) + '\n');
                 //}
-                //if (channelId === 'undefined') {
-                //    msg.reply('That voice channel does not exist')
-                //    break;
-                //}
-                //shows all channel ids
-                //console.log(value.id)
-            //}
+
+                //msg.reply(name);
+
+                //calls googlde sheets function
+                authorizeGoogleSheets();
 
 
+                break;
+            //grabs all Discord Members in role
+            case 'roles':
+                msg.channel.send('exporting all members with declared role');
 
-            //displays entire map 
-            //console.log(rolesMap);
+                let roleId = '';
 
+                //pulls all information for what sheet and tab to save data to
+                if (cmdArray[2] == 'Personal' || 'Comp' || 'Practice') {
+                    switch (cmdArray[2]) {
+                        case 'Personal':
+                            sheetId = personalSpreadsheetId;
+                            break;
+                        case 'Comp':
+                            sheetId = tlCompSpreadsheetId;
+                            break;
+                        case 'Practice':
+                            sheetId = tlPracSpreadsheetId;
+                            break;
+                        case 'FNF':
+                            sheetId = fnfSpreadsheetId;
+                            break;
+                    }
+                    tabName = cmdArray[3];
+                }
+                if (cmdArray.length > 3) {
+                    roleId = cmdArray[4];
+                }
 
-            //let membersWithRole = msg.guild.members.filter(member => {
-            //    return member.roles.find("name", roleName);
-            //}).map(member => {
-            //    return member.user.username;
-            //})
+                //resets array
+                sheetsData = [];
 
+                let list = client.guilds.cache.get(TLDiscordId);
 
-            //let tempMembers = msg.guild.roles.cache.find(role => role.id === '811834212629610508').members.map(m => m.user.tag);
+                try {
+                    await list.members.fetch();
 
-            //let tempMembers = msg.guild.roles.get('811834212629610508').members.map(m => m.user.id);
+                    let role1 = list.roles.cache.get(roleId)
 
-            //console.log(membersWithRole);
+                    for (const [key, value] of role1.members) {
+                        sheetsData.push([value.user.id, value.user.username, value.user.discriminator]);
+                    }
 
-            //for (var i = 0; i < tempMembers.length; i++) {
-            //    //console.log(members[i]['displayName']);
-            //    sheetsData.push([tempMembers[i]]);
-            //}
+                } catch (err) {
+                    console.error(err);
+                }
 
-            //sheetsData = tempMembers;
+                authorizeGoogleSheets();
 
-            //authorizeGoogleSheets();
-            break;
-        default:
-            break;
+                break;
+            case 'names':
+
+                //pulls all information for what sheet and tab to save data to
+                if (cmdArray[2] == 'Personal' || 'Comp' || 'Practice') {
+                    switch (cmdArray[2]) {
+                        case 'Personal':
+                            sheetId = personalSpreadsheetId;
+                            break;
+                        case 'Comp':
+                            sheetId = tlCompSpreadsheetId;
+                            break;
+                        case 'Practice':
+                            sheetId = tlPracSpreadsheetId;
+                            break;
+                        case 'FNF':
+                            sheetId = fnfSpreadsheetId;
+                            break;
+                    }
+                    tabName = cmdArray[3];
+                }
+
+                //resets array
+                sheetsData = [];
+
+                let tempdiscord = client.guilds.cache.find((g) => g.id === TLDiscordId);
+
+                try {
+                    await tempdiscord.members.fetch();
+
+                    tempdiscord.members.cache.each(member => sheetsData.push([member.user.id, member.user.username, member.user.discriminator]));
+                    //tempdiscord.members.cache.each(member => console.log([(member.user.id)]));
+
+                } catch (err) {
+                    console.error(err);
+                }
+
+                authorizeGoogleSheets();
+
+                break;
+            case 'banned':
+
+                //pulls all information for what sheet and tab to save data to
+                if (cmdArray[2] == 'Personal' || 'Comp' || 'Practice') {
+                    switch (cmdArray[2]) {
+                        case 'Personal':
+                            sheetId = personalSpreadsheetId;
+                            break;
+                        case 'Comp':
+                            sheetId = tlCompSpreadsheetId;
+                            break;
+                        case 'Practice':
+                            sheetId = tlPracSpreadsheetId;
+                            break;
+                        case 'FNF':
+                            sheetId = fnfSpreadsheetId;
+                            break;
+                    }
+                    tabName = cmdArray[3];
+                }
+
+                //resets array
+                sheetsData = [];
+
+                let tempban = client.guilds.cache.find((g) => g.id === TLDiscordId);
+
+                tempban.bans.fetch()
+                    .then(console.log)
+                    .catch(console.log);
+
+                authorizeGoogleSheets();
+
+                break;
+            default:
+                break;
+        }
     }
 
     function sendToGoogleSheets(auth) {
