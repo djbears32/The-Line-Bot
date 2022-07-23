@@ -5,6 +5,7 @@ const { Client, Intents, Message, User, Channel, Role } = require('discord.js');
 const { fetch } = require('node-fetch');
 const { token } = require('./auth.json');
 
+//Testing Repo Change
 //google sheets
 const { google } = require('googleapis');
 const fs = require('fs');
@@ -205,7 +206,7 @@ client.on('messageCreate', async msg => {
                     let role1 = list.roles.cache.get(roleId)
 
                     for (const [key, value] of role1.members) {
-                        sheetsData.push([value.user.id, value.user.username, value.user.discriminator]);
+                        sheetsData.push([value.user.id, value.displayName, value.user.discriminator]);
                     }
 
                 } catch (err) {
@@ -254,7 +255,7 @@ client.on('messageCreate', async msg => {
                 authorizeGoogleSheets();
 
                 break;
-            case 'banned':
+            case 'seeding':
 
                 //pulls all information for what sheet and tab to save data to
                 if (cmdArray[2] == 'Personal' || 'Comp' || 'Practice') {
@@ -278,11 +279,21 @@ client.on('messageCreate', async msg => {
                 //resets array
                 sheetsData = [];
 
-                let tempban = client.guilds.cache.find((g) => g.id === TLDiscordId);
+                const channel = client.channels.cache.get(973403637017612378);
+                
+                await channel.messages.fetch({ limit: 100 }).then(messages => {
+                    console.log(`Received ${messages.size} messages`);
+                    //Iterate through the messages here with the variable "messages".
+                    messages.forEach(message => console.log(message.content))
+                })
+                console.log(channel);
 
-                tempban.bans.fetch()
-                    .then(console.log)
-                    .catch(console.log);
+                const seeder = {steamId: "", playerCount: ""}
+
+                if (msg.channel.id === 973403637017612378)
+                {
+                    
+                }
 
                 authorizeGoogleSheets();
 
